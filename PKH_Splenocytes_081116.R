@@ -9,6 +9,10 @@ setwd("~/Desktop/R_Folder")
 #Set the correct root folder for PC
 setwd("~/")
 
+#Be sure to load packages by going to the packages tab in the bottom right pane and click on the packages tab
+    #Once in the Packages tab, press the install button and search for the following packages and install them
+      # ggplot2,plyr,dplyr,RColorBrewer,reshape2
+
 #Load ggplot2,plyr and dplyr packages
 library(ggplot2)
 library(plyr)
@@ -20,13 +24,16 @@ library(reshape2)
 as.numeric.factor <- function(x) {as.numeric(levels(x))[x]}
 
 #Import group1.csv
-my_data <- "PKH_Splenocytes_081116.csv"
-sp <- read.csv(my_data, sep = ",", header = TRUE)
+data <- "PKH_Splenocytes_081116.csv"
+my_data <- read.csv(data, sep = ",", header = TRUE)
 
 #Remove columns "Data_Set", "X_Parameter", "Y_Parameter" as they aren't necessary for analysis
-sp$Data_Set <- NULL
-sp$X_Parameter <- NULL
-sp$Y_Parameter <- NULL
+my_data$Data_Set <- NULL
+my_data$X_Parameter <- NULL
+my_data$Y_Parameter <- NULL
+
+#Tell R to ignore missing data, it will ignore the control tubes (FMO,Single stain, IgG Cocktai,Auto, etc....)
+sp <- na.omit(my_data)
 
 #Make sure you imported the CSV file
 summary(sp)
@@ -45,9 +52,6 @@ tail(sp)
 
 
 
-
-
-
 ######## MAKING A PLOT FOR CELLS THAT ARE PKH POSITIVE##########################
 
 
@@ -56,9 +60,9 @@ PKH <- sp[sp$Gate %in% c("PKH_Pos"),]
 
 #Summarize data (Average the technical replicates)
 PKH_data <- ddply(PKH, c("Animal","Condition","Parameter","Gate"), summarise,
-                 N    = length(X.Gated),
-                 mean = mean(X.Gated),
-                 sd   = sd(X.Gated),
+                 N    = length(Gated),
+                 mean = mean(Gated),
+                 sd   = sd(Gated),
                  se   = sd / sqrt(N))
 
 #Rename "mean" column in sp_data to "average" to avoid confusion
@@ -116,9 +120,9 @@ PKH_MHCII <- sp[sp$Gate %in% c("PKH+MHCII+"),]
 
 #Summarize data (Average the technical replicates)
 PKH_MHCII_data <- ddply(PKH_MHCII, c("Animal","Condition","Parameter","Gate"), summarise,
-                  N    = length(X.Gated),
-                  mean = mean(X.Gated),
-                  sd   = sd(X.Gated),
+                  N    = length(Gated),
+                  mean = mean(Gated),
+                  sd   = sd(Gated),
                   se   = sd / sqrt(N))
 
 #Rename "mean" column in sp_data to "average" to avoid confusion
@@ -149,7 +153,7 @@ PKH_MHCII_plot <- ggplot(Avg_PKH_MHCII_data, aes(x=Condition, y=mean, fill=Param
 PKH_MHCII_final <- PKH_MHCII_plot + publication_style
 
 #Test to see if it works
-PKH_MHCII_final + 
+PKH_MHCII_final  
 
 #Save as very high quality PNG @ 600dpi
 #good for publications
@@ -158,8 +162,125 @@ PKH_MHCII_final
 dev.off()
 
 
+####################### Plotting PKH67+ Cells of All MHCII+ Cells
+#*****************************************************************************
+#*************************************************************************************
+
+#Summarize data for MHCII + cells
+sp_MHCII <- sp[sp$Gate %in% c("PKH+MHCII+","PKH-MHCII+"), ]
+
+#Calculate average total number of cells for each technical replicate
+sp_MHCII_total <- ddply(sp_MHCII, c("Animal","Condition","Parameter","Gate"), summarise,
+      N    = length(Gated),
+      mean = mean(Gated),
+      sd   = sd(Gated),
+      se   = sd / sqrt(N))
+
+sp_MHCII_total <- rename(sp_MHCII_total, average = mean)
+
+MHCII_total <- ddply(sp_MHCII_total, c("Condition","Parameter"), summarise,
+                     N    = length(average),
+                     mean = mean(average),
+                     sd   = sd(average),
+                     se   = sd / sqrt(N))
 
 
+#Filter within the Gate Column for PKH_pos
+PKH_MHCII_only <- sp[sp$Gate %in% c("PKH+MHCII+","PKH-MHCII+"), ]
+
+
+PKH_MHCII_only <- ddply(PKH_MHCII_only, c("Animal","Condition","Parameter","Gate"), summarise,
+                        N    = length(Gated),
+                        mean = mean(Gated),
+                        sd   = sd(Gated),
+                        se   = sd / sqrt(N))
+
+#Rename "mean" column in sp_data to "average" to avoid confusion
+PKH_MHCII_only <- rename(PKH_MHCII_only, average = mean)
+
+#Calculate the Average value of three animals, N=3
+Avg_PKH_MHCII_only <- ddply(PKH_MHCII_only, c("Condition","Parameter","Gate"), summarise,
+                            N    = length(average),
+                            mean = mean(average),
+                            sd   = sd(average),
+                            se   = sd / sqrt(N))
+
+
+#Plot PKH data
+
+PKH_MHCII_only_plot <- ggplot(Avg_PKH_MHCII_only, aes(x=Condition, y=mean, fill=Parameter)) +
+  geom_bar(position=position_dodge(), stat="identity") +
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se), 
+                size=0.5,   #Size of the error bars
+                width=.25,  # Width of the error bars
+                position=position_dodge(.9)) + #Where to put the errorbars
+  xlab("Treatment Condition") +  # X axis label
+  ylab("MHC II+ Cells with PKH67 Exo (%)") +  # Y axis label
+  ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) + 
+  ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 60)) # Plot title, make graph sit on x axis, define y axis values
+
+#Finalize plot
+PKH_MHCII_only_final <- PKH_MHCII_only_plot + publication_style
+
+#Test to see if it works
+PKH_MHCII_Only_final  
+
+#Save as very high quality PNG @ 600dpi
+#good for publications
+png("~/R_plots/PKH_MHCII_only_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+PKH_MHCII_final
+dev.off()
+
+
+
+########################  Create graph of PKH+ F4.80+ cells####################################
+
+
+#Filter within the Gate Column for PKH_pos
+PKH_F4.80 <- sp[sp$Gate %in% c("PKH+F4.80+"),]
+
+#Summarize data (Average the technical replicates)
+PKH_F4.80_data <- ddply(PKH_MHCII, c("Animal","Condition","Parameter","Gate"), summarise,
+                        N    = length(Gated),
+                        mean = mean(Gated),
+                        sd   = sd(Gated),
+                        se   = sd / sqrt(N))
+
+#Rename "mean" column in sp_data to "average" to avoid confusion
+PKH_F4.80_data <- rename(PKH_F4.80_data, average = mean)
+
+#Calculate the Average value of three animals, N=3
+Avg_PKH_F4.80_data <- ddply(PKH_F4.80_data, c("Condition","Parameter"), summarise,
+                            N    = length(average),
+                            mean = mean(average),
+                            sd   = sd(average),
+                            se   = sd / sqrt(N))
+
+
+#Plot PKH data
+
+PKH_F4.80_plot <- ggplot(Avg_PKH_MHCII_data, aes(x=Condition, y=mean, fill=Parameter)) +
+  geom_bar(position=position_dodge(), stat="identity") +
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se), 
+                size=0.5,   #Size of the error bars
+                width=.25,  # Width of the error bars
+                position=position_dodge(.9)) + #Where to put the errorbars
+  xlab("Treatment Condition") +  # X axis label
+  ylab("Percentage of PKH67+ F4/80+ Cells") +  # Y axis label
+  ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) + 
+  ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 60)) # Plot title, make graph sit on x axis, define y axis values
+
+#Finalize plot
+PKH_F4.80_final <- PKH_F4.80_plot + publication_style
+
+#Test to see if it works
+PKH_F4.80_final  
+
+#Save as very high quality PNG @ 600dpi
+#good for publications
+png("~/R_plots/PKH_F4.80_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+PKH_MHCII_final
+dev.off()
 
 
 
