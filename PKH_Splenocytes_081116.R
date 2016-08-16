@@ -17,6 +17,7 @@ setwd("~/")
 library(ggplot2)
 library(plyr)
 library(dplyr)
+library(magrittr)
 library(RColorBrewer)
 library(reshape2)
 
@@ -59,7 +60,7 @@ tail(sp)
 PKH <- sp[sp$Gate %in% c("PKH_Pos"),]
 
 #Summarize data (Average the technical replicates)
-PKH_data <- ddply(PKH, c("Animal","Condition","Parameter","Gate"), summarise,
+PKH_data <- ddply(PKH, c("Replicate","Animal","Condition","Parameter","Gate"), summarise,
                  N    = length(Gated),
                  mean = mean(Gated),
                  sd   = sd(Gated),
@@ -83,9 +84,9 @@ PKH_plot <- ggplot(Avg_PKH_data, aes(x=Condition, y=mean, fill=Parameter)) +
                 width=.25,  # Width of the error bars
                 position=position_dodge(.9)) + #Where to put the errorbars
   xlab("Treatment Condition") +  # X axis label
-  ylab("Percentage of PKH67+ Cells") +  # Y axis label
+  ylab(" % PKH67+ Cells") +  # Y axis label
   ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) + 
-  ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 60)) # Plot title, make graph sit on x axis, define y axis values
+  ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
 
 #Make a default theme for optimizeing graph aesthetics
 publication_style <- theme(axis.line.x=element_line(color="black",size=1.0),    #Make X axis size 1.0 and black
@@ -119,7 +120,7 @@ dev.off()
 PKH_MHCII <- sp[sp$Gate %in% c("PKH+MHCII+"),]
 
 #Summarize data (Average the technical replicates)
-PKH_MHCII_data <- ddply(PKH_MHCII, c("Animal","Condition","Parameter","Gate"), summarise,
+PKH_MHCII_data <- ddply(PKH_MHCII, c("Replicate","Animal","Condition","Parameter","Gate"), summarise,
                   N    = length(Gated),
                   mean = mean(Gated),
                   sd   = sd(Gated),
@@ -145,9 +146,9 @@ PKH_MHCII_plot <- ggplot(Avg_PKH_MHCII_data, aes(x=Condition, y=mean, fill=Param
                 width=.25,  # Width of the error bars
                 position=position_dodge(.9)) + #Where to put the errorbars
   xlab("Treatment Condition") +  # X axis label
-  ylab("Percentage of PKH67+ MHC II+ Cells") +  # Y axis label
+  ylab("% PKH67+ MHCII+ Cells") +  # Y axis label
   ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) + 
-  ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 60)) # Plot title, make graph sit on x axis, define y axis values
+  ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
 
 #Finalize plot
 PKH_MHCII_final <- PKH_MHCII_plot + publication_style
@@ -162,13 +163,112 @@ PKH_MHCII_final
 dev.off()
 
 
-####################### Plotting PKH67+ Cells of All MHCII+ Cells
+####################### Plotting MHCII+ Cells that are PKH67+!!!!
 #*****************************************************************************
 #*************************************************************************************
 
-#Summarize data for MHCII + cells
+#Define popultion of MHCII+ cells
+MHCII_cells <- c("PKH+MHCII+","PKH-MHCII+")
+
+
+#Summarize data for MHCII + cells using plyr package
 sp_MHCII <- sp[sp$Gate %in% c("PKH+MHCII+","PKH-MHCII+"), ]
 
+
+#Summarize data for MHCII+ cells using dplyr package
+sp_MHCII_dplyr <- filter(sp,Gate %in% c("PKH+MHCII+","PKH-MHCII+"))
+
+
+#Summarize data for MHCII+ cells using dplyr package using simplified function
+sp_MHCII_dplyr_2 <- filter(sp,Gate %in% MHCII_cells)
+
+
+test <- select(sp,Replicate,Animal,Condition,Parameter,Gate,Number,Total,Gated)
+filter(test,Gate == "PKH-MHCII+"| Gate == "PKH+MHCII+")
+
+
+#Using ddply to achieve the same result
+ddply_test_group <- sp %>%
+                select(Replicate,Animal,Condition,Parameter,Gate,Number,Total,Gated) %>%
+                filter(Gate == "PKH-MHCII+"| Gate == "PKH+MHCII+")
+
+
+                filter(Parameter == "5ug"| Parameter == "Dye") %>%
+                filter(Condition == "Trypsin"| Condition == "PBS") %>%
+                filter(Animal == "1"| Animal == "2" | Animal == "3")%>%
+                filter(Replicate == "1"| Replicate == "2")%>%
+                  mutate(sum= sum(Number))
+
+
+
+#THIS IS THE CODE!
+#Determine the toatl Number of MHCII+ cells 
+sp_MHCII_total <- ddply(sp_MHCII, c("Replicate","Animal","Condition","Parameter"), summarise,
+                        MHCII = sum(Number))
+sp_MHCII_total <-  sp_MHCII_total%>%
+                            arrange(Replicate,Animal,Condition,Parameter)
+
+#Filter only for MHCII+ cells that are PKH+
+sp_PKH <- sp_MHCII %>%
+              select(Replicate:Number) %>%
+              arrange(Replicate,Animal,Condition,Parameter) %>%
+              filter(Gate == "PKH+MHCII+")
+
+#Combine the two data sets
+sp_PKH_MHCII <- cbind(sp_PKH,sp_MHCII_total$MHCII)
+
+
+#Rename the column FIGURE THIS OUT LATER
+sp_PKH_MHCII <- rename(sp_PKH_MHCII, 'MHCII' = 'sp_MHCII_total$MHCII')
+
+sp_PKH_MHCII$`sp_MHCII_total$MHCII`
+
+#Mutate to get the ratio of MHCII+ cells that are PKH+
+sp_PKH_MHCII_ratio <- sp_PKH_MHCII %>%
+    mutate(Ratio = Number/sp_MHCII_total$MHCII * 100)
+
+#Summarize data (Average the technical replicates)
+PKH_MHCII_ratio_data <- ddply(sp_PKH_MHCII_ratio, c("Animal","Condition","Parameter"), summarise,
+                              N = length(Ratio),
+                              mean = mean(Ratio),
+                              sd = sd(Ratio),
+                              se = sd / sqrt(N))
+
+#Rename "mean" column in sp_data to "average" to avoid confusion
+PKH_MHCII_ratio_data <- rename(PKH_MHCII_ratio_data, average = mean)
+                 
+#Calculate the Average value of three animals, N=3
+Avg_PKH_MHCII_ratio_data <- ddply(PKH_MHCII_ratio_data, c("Condition","Parameter"), summarise,
+                            N    = length(average),
+                            mean = mean(average),
+                            sd   = sd(average),
+                            se   = sd / sqrt(N))
+
+Ratio_MHCII_PKHpos_plot <- ggplot(Avg_PKH_MHCII_ratio_data, aes(x=Condition, y=mean, fill=Parameter)) +
+  geom_bar(position=position_dodge(), stat="identity") +
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se), 
+                size=0.5,   #Size of the error bars
+                width=.25,  # Width of the error bars
+                position=position_dodge(.9)) + #Where to put the errorbars
+  xlab("Treatment Condition") +  # X axis label
+  ylab(" % MHCII Cells +ve for PKH67") +  # Y axis label
+  ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) + 
+  ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
+
+#Finalize plot
+Ratio_MHCII_PKHpos_plot_final <- Ratio_MHCII_PKHpos_plot + publication_style
+
+#Test to see if it works
+Ratio_MHCII_PKHpos_plot_final 
+
+#Save as very high quality PNG @ 600dpi
+#good for publications
+png("~/R_plots/Ratio_MHCII_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+Ratio_MHCII_PKHpos_plot_final 
+dev.off()
+
+
+#HOLD ON
 #Calculate average total number of cells for each technical replicate
 sp_MHCII_total <- ddply(sp_MHCII, c("Animal","Condition","Parameter","Gate"), summarise,
       N    = length(Gated),
