@@ -1,3 +1,12 @@
+#########This is a guideline for importing and formating the data as well as the code to generate all the graphs/figures
+
+#To Clear working environment
+rm(list=ls())
+
+# Set the correct root folder for Mac
+setwd("~/Desktop/R_Folder")
+
+#Set the correct root folder for PC
 setwd("~/")
 
 #Be sure to load packages by going to the packages tab in the bottom right pane and click on the packages tab
@@ -15,22 +24,29 @@ library(reshape2)
 library(ggvis)
 
 #Import PKH_splenocytes.csv
-data <- "PKH_Splenocytes_081816.csv"
+data <- "PKH_Splenocytes_082616.csv"
 raw_data <- read.csv(data, sep = ",", header = TRUE)
 
 #Tell R to ignore missing data, it will ignore the control tubes (FMO,Single stain, IgG Cocktai,Auto, etc....)
-sp <- na.omit(raw_data) %>%
-  select(Replicate,Animal,Condition,Parameter,Input_Gate,Gate,Number,Total,Gated) %>% #View only these specific columns
-  arrange(Replicate,Animal,Condition,Parameter,Input_Gate) #Arrange rows in ascending order
 
-sp$Gated <- as.numeric(as.character(sp$Gated)) # Ensure that the Gated column is read properly
+my_data <- raw_data %>%
+  select(Data.Set,Input.Gate,X.Parameter,Y.Parameter,Gate,Number,X.Total,X.Gated)%>% #Select for which columns that are of interest
+  separate(Data.Set, c("Tube","Parameter","Animal","Condition"), sep= "_")#Separate Data.Set column into different columns
 
+sp <- my_data%>% 
+  select(-Tube)%>%
+  filter(Animal == "1"|Animal == "2"|Animal == "3")%>%
+  arrange(Animal,Condition,Parameter,Input.Gate)#Arrange rows in ascending order
 
-sp2 <- na.omit(raw_data) %>%
-  select(Replicate,Animal,Condition,Parameter,Input_Gate,X_Parameter,Y_Parameter,Gate,Number,Total,Gated)
-  arrange(Replicate,Animal,Condition,Parameter,Input_Gate)
+sp$X.Gated <- as.numeric(as.character(sp$X.Gated)) # Ensure that the Gated column is read properly
+sp$Parameter <- as.factor(as.character(sp$Parameter))
+sp$Animal <- as.factor(as.character(sp$Animal))
+sp$Condition <- as.factor(as.character(sp$Condition))
 
-sp2$Gated <- as.numeric(as.character(sp2$Gated))
+levels(sp$Parameter) <- c("Dye","1ug","5ug","10ug") #Set the correct order 
+levels(sp$Condition) <- c("4","37") #Set the correct order
+
+str(sp)
 
 #Make a default theme for optimizeing graph aesthetics
 publication_style <- theme(axis.line.x=element_line(color="black",size=1.0), #Make X axis size 1.0 and black
@@ -59,12 +75,14 @@ publication_style <- theme(axis.line.x=element_line(color="black",size=1.0), #Ma
 Monocytes <- sp %>%
   filter(Gate == "CD11b+F4.80-")%>%              #Filter for cells that are CD11b+ and F4.80+
   group_by(Animal,Condition,Parameter)%>%   #Organize the data by Replicate, Animal, Condition,Parameter
-  mutate(average = mean(Gated))%>%          #Create a new column to average the technical replicates (2)
+  mutate(average = mean(X.Gated))%>%          #Create a new column to average the technical replicates (2)
   group_by(Condition,Parameter)%>%          #Organize the data by looking at the Condition and Parameter columns
   summarise(   N = length(average),         #Summarize the data by averaging the three biological replicates and calculate the standard deviation
                mean = mean(average),           #and standard error
                sd = sd(average),
                se = sd / sqrt(N))
+
+Monocytes
 
 #Generate a graph
 Monocytes_plot <- ggplot(Monocytes, aes(x=Condition, y=mean, fill=Parameter)) +
@@ -87,7 +105,7 @@ Monocytes_final
 
 #Save as very high quality PNG @ 600dpi
 #good for publications
-png("~/R_plots/Monocytes_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+png("~/R_plots/Monocytes_Dose_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
 Monocytes_final
 dev.off()  
 
@@ -99,7 +117,7 @@ dev.off()
 Macrophages <- sp %>%
   filter(Gate == "CD11b-F4.80+")%>%              #Filter for cells that are CD11b+ and F4.80+
   group_by(Animal,Condition,Parameter)%>%   #Organize the data by Replicate, Animal, Condition,Parameter
-  mutate(average = mean(Gated))%>%          #Create a new column to average the technical replicates (2)
+  mutate(average = mean(X.Gated))%>%          #Create a new column to average the technical replicates (2)
   group_by(Condition,Parameter)%>%          #Organize the data by looking at the Condition and Parameter columns
   summarise(   N = length(average),         #Summarize the data by averaging the three biological replicates and calculate the standard deviation
                mean = mean(average),           #and standard error
@@ -127,7 +145,7 @@ Macrophages_final
 
 #Save as very high quality PNG @ 600dpi
 #good for publications
-png("~/R_plots/Macrophages_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+png("~/R_plots/Macrophages_Dose_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
 Macrophages_final
 dev.off()  
 
@@ -137,7 +155,7 @@ dev.off()
 Dendritic_Cells <- sp %>%
   filter(Gate == "CD11c+MHCII+")%>%              #Filter for cells that are CD11c+ and MHCII+
   group_by(Animal,Condition,Parameter)%>%   #Organize the data by Replicate, Animal, Condition,Parameter
-  mutate(average = mean(Gated))%>%          #Create a new column to average the technical replicates (2)
+  mutate(average = mean(X.Gated))%>%          #Create a new column to average the technical replicates (2)
   group_by(Condition,Parameter)%>%          #Organize the data by looking at the Condition and Parameter columns
   summarise(   N = length(average),         #Summarize the data by averaging the three biological replicates and calculate the standard deviation
                mean = mean(average),           #and standard error
@@ -165,7 +183,7 @@ DC_final
 
 #Save as very high quality PNG @ 600dpi
 #good for publications
-png("~/R_plots/Dendritic_Cells_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+png("~/R_plots/Dendritic_Cells_Dose_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
 DC_final
 dev.off()  
 
@@ -177,15 +195,15 @@ dev.off()
 #Monocyte and PKH67 Labeled exosome uptake comparison
 #Look at Monocyte population then compare between Dye and 5ug conditions
 
-Monocyte_cells<-  sp2 %>% 
-  filter(Input_Gate == "CD11b+F4.80-", X_Parameter == "APC-A", Y_Parameter == "FITC-A",Gate == "PKH+Mono+CD11b+"|Gate == "PKH-Mono+CD11b+")%>%
-  group_by(Replicate,Animal,Condition,Parameter)%>%
+Monocyte_cells<-  sp %>% 
+  filter(Input.Gate == "[CD11b+F4.80-]",Gate == "PKH+CD11b+"|Gate == "PKH-CD11b+")%>%
+  group_by(Animal,Condition,Parameter)%>%
   mutate(Total_Monocytes = sum(Number))
   
-PKH.Monocytes <- sp2 %>%                                      
-  group_by(Replicate,Animal,Condition,Parameter)%>%    
-  select(-Total,-Gated)%>%                              
-  filter(Gate == "PKH+Mono+CD11b+")
+PKH.Monocytes <- sp %>%                                      
+  group_by(Animal,Condition,Parameter)%>%    
+  select(-X.Total,-X.Gated)%>%                              
+  filter(Gate == "PKH+CD11b+")
 
 Gated_Monocytes_PKH <-inner_join(PKH.Monocytes,Monocyte_cells)%>%           
   mutate(Ratio = (Number/Total_Monocytes) * 100 )%>%  
@@ -565,3 +583,8 @@ Ratio_F4.80_PKHpos_plot_final
 png("~/R_plots/Ratio_F4.80_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
 Ratio_F4.80_PKHpos_plot_final
 dev.off()
+
+
+
+
+
