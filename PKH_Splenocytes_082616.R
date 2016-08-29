@@ -43,10 +43,10 @@ sp$Parameter <- as.factor(as.character(sp$Parameter))
 sp$Animal <- as.factor(as.character(sp$Animal))
 sp$Condition <- as.factor(as.character(sp$Condition))
 
-levels(sp$Parameter) <- c("Dye","1ug","5ug","10ug") #Set the correct order 
-levels(sp$Condition) <- c("4","37") #Set the correct order
+sp$Parameter <- factor(sp$Parameter, levels = c("Dye","1ug","5ug","10ug")) #Set the correct order 
+sp$Condition <- factor(sp$Condition, levels = c("4","37")) #Set the correct order
 
-str(sp)
+str(sp) #Check if everything is recognized correctly
 
 #Make a default theme for optimizeing graph aesthetics
 publication_style <- theme(axis.line.x=element_line(color="black",size=1.0), #Make X axis size 1.0 and black
@@ -92,7 +92,7 @@ Monocytes_plot <- ggplot(Monocytes, aes(x=Condition, y=mean, fill=Parameter)) +
                 size=0.5, #Size of the error bars
                 width=.25, # Width of the error bars
                 position=position_dodge(.9)) + #Where to put the errorbars
-  xlab("Treatment Condition") + # X axis label
+  xlab("Treatment Condition (°C)") + # X axis label
   ylab("% CD11b+ F4/80- Cells") + # Y axis label
   ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
   ggtitle("Monocytes") + scale_y_continuous(expand=c(0,0),limits = c(0, 60)) # Plot title, make graph sit on x axis, define y axis values
@@ -105,11 +105,14 @@ Monocytes_final
 
 #Save as very high quality PNG @ 600dpi
 #good for publications
-png("~/R_plots/Monocytes_Dose_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+png("~/R_plots/Monocytes_Dose_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
 Monocytes_final
 dev.off()  
 
-
+#for Mac ~/Desktop/R_Folder
+png("~/Desktop/R_Folder/R_plots/Monocytes_Dose_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
+Monocytes_final
+dev.off()  
 
 #Identifying Macrophages
 #Gate on CD11b- F4.80+ Cells
@@ -132,7 +135,7 @@ Macrophages_plot <- ggplot(Macrophages, aes(x=Condition, y=mean, fill=Parameter)
                 size=0.5, #Size of the error bars
                 width=.25, # Width of the error bars
                 position=position_dodge(.9)) + #Where to put the errorbars
-  xlab("Treatment Condition") + # X axis label
+  xlab("Treatment Condition (°C)") + # X axis label
   ylab("% CD11b- F4/80+ Cells") + # Y axis label
   ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
   ggtitle("Macrophages") + scale_y_continuous(expand=c(0,0),limits = c(0, 60)) # Plot title, make graph sit on x axis, define y axis values
@@ -145,10 +148,15 @@ Macrophages_final
 
 #Save as very high quality PNG @ 600dpi
 #good for publications
-png("~/R_plots/Macrophages_Dose_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+png("~/R_plots/Macrophages_Dose_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
 Macrophages_final
 dev.off()  
 
+
+#For mac
+png("~/Desktop/R_Folder/R_plots/Macrophages_Dose_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
+Macrophages_final
+dev.off()  
 
 #Identify Dendritic Cell Population
 
@@ -170,24 +178,27 @@ geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
               size=0.5, #Size of the error bars
               width=.25, # Width of the error bars
               position=position_dodge(.9)) + #Where to put the errorbars
-xlab("Treatment Condition") + # X axis label
+xlab("Treatment Condition (°C)") + # X axis label
 ylab("% CD11c+ MHCII+ Cells") + # Y axis label
 ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
 ggtitle("Dendritic Cells") + scale_y_continuous(expand=c(0,0),limits = c(0, 60)) # Plot title, make graph sit on x axis, define y axis values
 
 #Finalize plot
-DC_final <- DC_plot + publication_style
+DC_final <- DC_plot + publication_style 
 
 #Test to see if it works
 DC_final 
 
 #Save as very high quality PNG @ 600dpi
 #good for publications
-png("~/R_plots/Dendritic_Cells_Dose_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+png("~/R_plots/Dendritic_Cells_Dose_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
 DC_final
 dev.off()  
 
-
+#For mac
+png("~/Desktop/R_Folder/R_plots/Dendritic_Cells_Dose_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
+DC_final
+dev.off()  
 
 ############################################################################################################################
 
@@ -223,36 +234,40 @@ Ratio_Monocytes_PKHpos_plot <- ggplot(Gated_Monocytes_PKH, aes(x=Condition, y=me
                 size=0.5, #Size of the error bars
                 width=.25, # Width of the error bars
                 position=position_dodge(.9)) + #Where to put the errorbars
-  xlab("Treatment Condition") + # X axis label
+  xlab("Treatment Condition (°C)") + # X axis label
   ylab(" % of Cells PKH+") + # Y axis label
   ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
   ggtitle("CD11b+ F4/80- Monocytes") + scale_y_continuous(expand=c(0,0),limits = c(0, 100)) # Plot title, make graph sit on x axis, define y axis values
 
 #Finalize plot
-Ratio_Monocytes_PKHpos_plot_final <- Ratio_Monocytes_PKHpos_plot + publication_style
+Ratio_Monocytes_PKHpos_plot_final <- Ratio_Monocytes_PKHpos_plot + publication_style + scale_fill_brewer(palette="Greens")
 
 #Test to see if it works
-Ratio_Monocytes_PKHpos_plot_final 
+Ratio_Monocytes_PKHpos_plot_final
 
-#Save as very high quality PNG @ 600dpi
+#Save as very high quality PNG @ 1000dpi
 #good for publications
-png("~/R_plots/Ratio_Monocytes_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+png("~/R_plots/Ratio_Monocytes_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
 Ratio_Monocytes_PKHpos_plot_final
 dev.off()
 
+#For mac
+png("~/Desktop/R_Folder/R_plots/Ratio_Monocytes_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
+Ratio_Monocytes_PKHpos_plot_final
+dev.off()
 
 #Macrophage and PKH67 Labeled exosome uptake comparison
 #Look at Macrophage population then compare between Dye and 5ug conditions
 
-Macrophage_cells<- sp2 %>%
-  filter(Input_Gate == "CD11b-F4.80+", X_Parameter == "APC-Cy7-A", Y_Parameter == "FITC-A",Gate == "PKH+M0+F4.80+"|Gate == "PKH-M0+F4.80+")%>%
-  group_by(Replicate,Animal,Condition,Parameter)%>%
+Macrophage_cells<- sp %>%
+  filter(Input.Gate == "[CD11b-F4.80+]",Gate == "PKH+F4.80+"|Gate == "PKH-F4.80+")%>%
+  group_by(Animal,Condition,Parameter)%>%
   mutate(Total_Macrophages = sum(Number))
 
-PKH.Macrophages <- sp2 %>%                                      
-  group_by(Replicate,Animal,Condition,Parameter)%>%    
-  select(-Total,-Gated)%>%                              
-  filter(Gate == "PKH+M0+F4.80+")
+PKH.Macrophages <- sp %>%                                      
+  group_by(Animal,Condition,Parameter)%>%    
+  select(-X.Total,-X.Gated)%>%                              
+  filter(Gate == "PKH+F4.80+")
 
 Gated_Macrophages_PKH <-inner_join(PKH.Macrophages,Macrophage_cells)%>%           
   mutate(Ratio = (Number/Total_Macrophages) * 100 )%>%  
@@ -272,86 +287,40 @@ Ratio_Macrophages_PKHpos_plot <- ggplot(Gated_Macrophages_PKH, aes(x=Condition, 
                 size=0.5, #Size of the error bars
                 width=.25, # Width of the error bars
                 position=position_dodge(.9)) + #Where to put the errorbars
-  xlab("Treatment Condition") + # X axis label
+  xlab("Treatment Condition (°C)") + # X axis label
   ylab(" % of Cells PKH+") + # Y axis label
   ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
   ggtitle("CD11b- F4/80+ Macrophages") + scale_y_continuous(expand=c(0,0),limits = c(0, 100)) # Plot title, make graph sit on x axis, define y axis values
 
 #Finalize plot
-Ratio_Macrophages_PKHpos_plot_final <- Ratio_Macrophages_PKHpos_plot + publication_style
+Ratio_Macrophages_PKHpos_plot_final <- Ratio_Macrophages_PKHpos_plot + publication_style + scale_fill_brewer(palette="Greens")
 
 #Test to see if it works
 Ratio_Macrophages_PKHpos_plot_final 
 
 #Save as very high quality PNG @ 600dpi
 #good for publications
-png("~/R_plots/Ratio_Macrophages_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+png("~/R_plots/Ratio_Macrophages_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
 Ratio_Macrophages_PKHpos_plot_final
 dev.off()
 
-
-
-
-#Macrophage and PKH67 Labeled exosome uptake comparison
-#Look at Macrophage population then compare between Dye and 5ug conditions
-
-Macrophage_cells<- sp2 %>%
-  filter(Input_Gate == "CD11b-F4.80+", X_Parameter == "APC-Cy7-A", Y_Parameter == "FITC-A",Gate == "PKH+M0+F4.80+"|Gate == "PKH-M0+F4.80+")%>%
-  group_by(Replicate,Animal,Condition,Parameter)%>%
-  mutate(Total_Macrophages = sum(Number))
-
-PKH.Macrophages <- sp2 %>%                                      
-  group_by(Replicate,Animal,Condition,Parameter)%>%    
-  select(-Total,-Gated)%>%                              
-  filter(Gate == "PKH+M0+F4.80+")
-
-Gated_Macrophages_PKH <-inner_join(PKH.Macrophages,Macrophage_cells)%>%           
-  mutate(Ratio = (Number/Total_Macrophages) * 100 )%>%  
-  group_by(Animal,Condition,Parameter)%>%   
-  mutate(average = mean(Ratio))%>%          
-  group_by(Condition,Parameter)%>%          
-  summarise(   N = length(average),         
-               mean = mean(average),           
-               sd = sd(average),
-               se = sd / sqrt(N))
-
-#Generate a graph
-Ratio_Macrophages_PKHpos_plot <- ggplot(Gated_Macrophages_PKH, aes(x=Condition, y=mean, fill=Parameter)) +
-  geom_bar(position=position_dodge(), stat="identity",colour="black") +
-  #scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
-  geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
-                size=0.5, #Size of the error bars
-                width=.25, # Width of the error bars
-                position=position_dodge(.9)) + #Where to put the errorbars
-  xlab("Treatment Condition") + # X axis label
-  ylab(" % of Cells PKH+") + # Y axis label
-  ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
-  ggtitle("CD11b- F4/80+ Macrophages") + scale_y_continuous(expand=c(0,0),limits = c(0, 100)) # Plot title, make graph sit on x axis, define y axis values
-
-#Finalize plot
-Ratio_Macrophages_PKHpos_plot_final <- Ratio_Macrophages_PKHpos_plot + publication_style
-
-#Test to see if it works
-Ratio_Macrophages_PKHpos_plot_final 
-
-#Save as very high quality PNG @ 600dpi
-#good for publications
-png("~/R_plots/Ratio_Macrophages_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+#For mac
+png("~/Desktop/R_Folder/R_plots/Ratio_Macrophages_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
 Ratio_Macrophages_PKHpos_plot_final
 dev.off()
 
 #Dendritic Cell and PKH67 Labeled exosome uptake comparison
 #Look at Dendritic Cell population then compare between Dye and 5ug conditions
 
-Dendritic_cells<- sp2 %>%
-  filter(Input_Gate == "CD11c+MHCII+")%>%
-  group_by(Replicate,Animal,Condition,Parameter)%>%
+Dendritic_cells<- sp %>%
+  filter(Input.Gate == "[CD11c+MHCII+]")%>%
+  group_by(Animal,Condition,Parameter)%>%
   mutate(Total_DCs = sum(Number))
 
-PKH.DCs <- sp2 %>%                                      
-  group_by(Replicate,Animal,Condition,Parameter)%>%    
-  select(-Total,-Gated)%>%                              
-  filter(Gate == "PKH+DC+")
+PKH.DCs <- sp %>%                                      
+  group_by(Animal,Condition,Parameter)%>%    
+  select(-X.Total,-X.Gated)%>%                              
+  filter(Gate == "PKH+.DC.MHCII+")
 
 Gated_DCs_PKH <-inner_join(PKH.DCs,Dendritic_cells)%>%           
   mutate(Ratio = (Number/Total_DCs) * 100 )%>%  
@@ -371,32 +340,36 @@ Ratio_DCs_PKHpos_plot <- ggplot(Gated_DCs_PKH, aes(x=Condition, y=mean, fill=Par
                 size=0.5, #Size of the error bars
                 width=.25, # Width of the error bars
                 position=position_dodge(.9)) + #Where to put the errorbars
-  xlab("Treatment Condition") + # X axis label
+  xlab("Treatment Condition (°C)") + # X axis label
   ylab(" % of Cells PKH+") + # Y axis label
   ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
-  ggtitle("CD11c+ MHCII+ Macrophages") + scale_y_continuous(expand=c(0,0),limits = c(0, 100)) # Plot title, make graph sit on x axis, define y axis values
+  ggtitle("CD11c+ MHCII+ Dendritic Cells") + scale_y_continuous(expand=c(0,0),limits = c(0, 100)) # Plot title, make graph sit on x axis, define y axis values
 
 #Finalize plot
-Ratio_DCs_PKHpos_plot_final <- Ratio_DCs_PKHpos_plot + publication_style
+Ratio_DCs_PKHpos_plot_final <- Ratio_DCs_PKHpos_plot + publication_style + scale_fill_brewer(palette="Greens")
 
 #Test to see if it works
 Ratio_DCs_PKHpos_plot_final 
 
 #Save as very high quality PNG @ 600dpi
 #good for publications
-png("~/R_plots/Ratio_DCs_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+png("~/R_plots/Ratio_DCs_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
+Ratio_DCs_PKHpos_plot_final
+dev.off()
+
+#For mac
+png("~/Desktop/R_Folder/R_plots/Ratio_DCs_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
 Ratio_DCs_PKHpos_plot_final
 dev.off()
 
 
-
 #Looking at MHCII+ population and calculating the ratio of cells that are PKH+
 MHCII_cells <- sp%>%
-  filter(Input_Gate == "APCs",Gate == "PKH-MHCII+" | Gate == "PKH+MHCII+") %>%
-  group_by(Replicate,Animal,Condition,Parameter)%>%
+  filter(Gate == "PKH-MHCII+" | Gate == "PKH+MHCII+") %>%
+  group_by(Animal,Condition,Parameter)%>%
   mutate(Total_MHCII = sum(Number))
 
-PKH.MHCII <- sp2 %>%                                      
+PKH.MHCII <- sp %>%                                      
   group_by(Replicate,Animal,Condition,Parameter)%>%    
   select(-Total,-Gated)%>%                              
   filter(Gate == "PKH+MHCII+")
@@ -420,7 +393,7 @@ Ratio_MHCII_PKHpos_plot <- ggplot(Gated_MHCII_PKH, aes(x=Condition, y=mean, fill
                 size=0.5, #Size of the error bars
                 width=.25, # Width of the error bars
                 position=position_dodge(.9)) + #Where to put the errorbars
-  xlab("Treatment Condition") + # X axis label
+  xlab("Treatment Condition (°C)") + # X axis label
   ylab(" % of Cells PKH+") + # Y axis label
   ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
   ggtitle("MHCII+ APC Splenocytes") + scale_y_continuous(expand=c(0,0),limits = c(0, 100)) # Plot title, make graph sit on x axis, define y axis values
@@ -433,22 +406,25 @@ Ratio_MHCII_PKHpos_plot_final
 
 #Save as very high quality PNG @ 600dpi
 #good for publications
-png("~/R_plots/Ratio_MHCII_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+png("~/R_plots/Ratio_MHCII_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
+Ratio_MHCII_PKHpos_plot_final
+dev.off()
+
+#For mac
+png("~/Desktop/R_Folder/R_plots/Ratio_MHCII_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
 Ratio_MHCII_PKHpos_plot_final
 dev.off()
 
 
-
-
 #Looking at CD11c+ population and calculating the ratio of cells that are PKH+
 CD11c_cells <- sp%>%
-  filter(Input_Gate == "APCs",Gate == "PKH-CD11c+" | Gate == "PKH+CD11c+") %>%
-  group_by(Replicate,Animal,Condition,Parameter)%>%
+  filter(Gate == "PKH-CD11c+" | Gate == "PKH+CD11c+") %>%
+  group_by(Animal,Condition,Parameter)%>%
   mutate(Total_CD11c = sum(Number))
 
-PKH.CD11c <- sp2 %>%                                      
-  group_by(Replicate,Animal,Condition,Parameter)%>%    
-  select(-Total,-Gated)%>%                              
+PKH.CD11c <- sp %>%                                      
+  group_by(Animal,Condition,Parameter)%>%    
+  select(-X.Total,-X.Gated)%>%                              
   filter(Gate == "PKH+CD11c+")
 
 Gated_CD11c_PKH <-inner_join(PKH.CD11c,CD11c_cells)%>%           
@@ -470,7 +446,7 @@ Ratio_CD11c_PKHpos_plot <- ggplot(Gated_CD11c_PKH, aes(x=Condition, y=mean, fill
                 size=0.5, #Size of the error bars
                 width=.25, # Width of the error bars
                 position=position_dodge(.9)) + #Where to put the errorbars
-  xlab("Treatment Condition") + # X axis label
+  xlab("Treatment Condition (°C)") + # X axis label
   ylab(" % of Cells PKH+") + # Y axis label
   ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
   ggtitle("CD11c+ APC Splenocytes") + scale_y_continuous(expand=c(0,0),limits = c(0, 100)) # Plot title, make graph sit on x axis, define y axis values
@@ -483,7 +459,12 @@ Ratio_CD11c_PKHpos_plot_final
 
 #Save as very high quality PNG @ 600dpi
 #good for publications
-png("~/R_plots/Ratio_CD11c_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+png("~/R_plots/Ratio_CD11c_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
+Ratio_CD11c_PKHpos_plot_final
+dev.off()
+
+#For mac
+png("~/Desktop/R_Folder/R_plots/Ratio_CD11c_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
 Ratio_CD11c_PKHpos_plot_final
 dev.off()
 
@@ -491,13 +472,13 @@ dev.off()
 
 #Looking at CD11b+ population and calculating the ratio of cells that are PKH+
 CD11b_cells <- sp%>%
-  filter(Input_Gate == "APCs",Gate == "PKH-CD11b+" | Gate == "PKH+CD11b+") %>%
-  group_by(Replicate,Animal,Condition,Parameter)%>%
+  filter(Gate == "PKH-CD11b+" | Gate == "PKH+CD11b+") %>%
+  group_by(Animal,Condition,Parameter)%>%
   mutate(Total_CD11b = sum(Number))
 
-PKH.CD11b <- sp2 %>%                                      
-  group_by(Replicate,Animal,Condition,Parameter)%>%    
-  select(-Total,-Gated)%>%                              
+PKH.CD11b <- sp %>%                                      
+  group_by(Animal,Condition,Parameter)%>%    
+  select(-X.Total,-X.Gated)%>%                              
   filter(Gate == "PKH+CD11b+")
 
 Gated_CD11b_PKH <-inner_join(PKH.CD11b,CD11b_cells)%>%           
@@ -519,20 +500,25 @@ Ratio_CD11b_PKHpos_plot <- ggplot(Gated_CD11b_PKH, aes(x=Condition, y=mean, fill
                 size=0.5, #Size of the error bars
                 width=.25, # Width of the error bars
                 position=position_dodge(.9)) + #Where to put the errorbars
-  xlab("Treatment Condition") + # X axis label
+  xlab("Treatment Condition (°C)") + # X axis label
   ylab(" % of Cells PKH+") + # Y axis label
   ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
   ggtitle("CD11b+ APC Splenocytes") + scale_y_continuous(expand=c(0,0),limits = c(0, 100)) # Plot title, make graph sit on x axis, define y axis values
 
 #Finalize plot
-Ratio_CD11b_PKHpos_plot_final <- Ratio_CD11b_PKHpos_plot + publication_style
+Ratio_CD11b_PKHpos_plot_final <- Ratio_CD11b_PKHpos_plot + publication_style + publication_style + scale_fill_brewer(palette="Greens")
 
 #Test to see if it works
 Ratio_CD11b_PKHpos_plot_final 
 
 #Save as very high quality PNG @ 600dpi
 #good for publications
-png("~/R_plots/Ratio_CD11b_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+png("~/R_plots/Ratio_CD11b_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
+Ratio_CD11b_PKHpos_plot_final
+dev.off()
+
+#For mac
+png("~/Desktop/R_Folder/R_plots/Ratio_CD11b_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
 Ratio_CD11b_PKHpos_plot_final
 dev.off()
 
@@ -567,7 +553,7 @@ Ratio_F4.80_PKHpos_plot <- ggplot(Gated_F4.80_PKH, aes(x=Condition, y=mean, fill
                 size=0.5, #Size of the error bars
                 width=.25, # Width of the error bars
                 position=position_dodge(.9)) + #Where to put the errorbars
-  xlab("Treatment Condition") + # X axis label
+  xlab("Treatment Condition (°C)") + # X axis label
   ylab(" % of Cells PKH+") + # Y axis label
   ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
   ggtitle("F4.80+ APC Splenocytes") + scale_y_continuous(expand=c(0,0),limits = c(0, 100)) # Plot title, make graph sit on x axis, define y axis values
@@ -580,11 +566,14 @@ Ratio_F4.80_PKHpos_plot_final
 
 #Save as very high quality PNG @ 600dpi
 #good for publications
-png("~/R_plots/Ratio_F4.80_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
+png("~/R_plots/Ratio_F4.80_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
 Ratio_F4.80_PKHpos_plot_final
 dev.off()
 
-
+#For mac
+png("~/Desktop/R_Folder/R_plots/Ratio_F4.80_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 1000)
+Ratio_F4.80_PKHpos_plot_final
+dev.off()
 
 
 
