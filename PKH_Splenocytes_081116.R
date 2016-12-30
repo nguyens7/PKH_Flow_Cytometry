@@ -2,6 +2,7 @@
 
 #To Clear working environment
 rm(list=ls())
+graphics.off()
 
 # Set the correct root folder for Mac
 setwd("~/Desktop/R_Folder")
@@ -13,14 +14,9 @@ setwd("~/")
 #Once in the Packages tab, press the install button and search for the following packages and install them
 # ggplot2,plyr,dplyr,RColorBrewer,reshape2
 
-#Load ggplot2,plyr and dplyr packages
-library(ggplot2)
-library(plyr)
-library(dplyr)
-library(tidyr)
-library(magrittr)
+#Load tidyverse and misc packages
+library(tidyverse)
 library(RColorBrewer)
-library(reshape2)
 library(ggvis)
 
 #Import PKH_splenocytes.csv
@@ -60,22 +56,22 @@ PKH <- sp %>%
   mutate(average = mean(Gated))%>%          #Create a new column to average the technical replicates (2)
   group_by(Condition,Parameter)%>%          #Organize the data by looking at the Condition and Parameter columns
   summarise(   N = length(average),         #Summarize the data by averaging the three biological replicates and calculate the standard deviation
-            mean = mean(average),           #and standard error
-              sd = sd(average),
-              se = sd / sqrt(N))
-  
+               mean = mean(average),           #and standard error
+               sd = sd(average),
+               se = sd / sqrt(N))
+
 #Generate a graph
 PKH_plot <- ggplot(PKH, aes(x=Condition, y=mean, fill=Parameter)) +
-geom_bar(position=position_dodge(), stat="identity",colour="black") +
-#scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
-geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
-              size=0.5, #Size of the error bars
-              width=.25, # Width of the error bars
-              position=position_dodge(.9)) + #Where to put the errorbars
-xlab("Treatment Condition") + # X axis label
-ylab(" % of Cells PKH67+") + # Y axis label
-## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
-ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
+  geom_bar(position=position_dodge(), stat="identity",colour="black") +
+  #scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+                size=0.5, #Size of the error bars
+                width=.25, # Width of the error bars
+                position=position_dodge(.9)) + #Where to put the errorbars
+  xlab("Treatment Condition") + # X axis label
+  ylab(" % of Cells PKH67+") + # Y axis label
+  ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
+  ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
 
 #Finalize plot
 PKH_final <- PKH_plot + publication_style
@@ -88,7 +84,7 @@ PKH_final
 png("~/R_plots/PKH_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
 PKH_final
 dev.off()  
-  
+
 
 ######## MAKING A PLOT FOR CELLS THAT ARE CD11b POSITIVE##########################  
 CD11b <- sp %>%
@@ -103,16 +99,16 @@ CD11b <- sp %>%
 
 #Generate a graph
 CD11b_plot <- ggplot(CD11b, aes(x=Condition, y=mean, fill=Parameter)) +
-geom_bar(position=position_dodge(), stat="identity",colour="black") +
-#scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
-geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
-              size=0.5, #Size of the error bars
-              width=.25, # Width of the error bars
-              position=position_dodge(.9)) + #Where to put the errorbars
-xlab("Treatment Condition") + # X axis label
-ylab(" % of Cells CD11b+") + # Y axis label
-## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
-ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
+  geom_bar(position=position_dodge(), stat="identity",colour="black") +
+  #scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+                size=0.5, #Size of the error bars
+                width=.25, # Width of the error bars
+                position=position_dodge(.9)) + #Where to put the errorbars
+  xlab("Treatment Condition") + # X axis label
+  ylab(" % of Cells CD11b+") + # Y axis label
+  ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
+  ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
 
 #Finalize plot
 CD11b_final <- CD11b_plot + publication_style
@@ -139,16 +135,16 @@ CD11c <- sp %>%
 
 #Generate a graph
 CD11c_plot <- ggplot(CD11c, aes(x=Condition, y=mean, fill=Parameter)) +
-geom_bar(position=position_dodge(), stat="identity",colour="black") +
-#scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
-geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
-              size=0.5, #Size of the error bars
-              width=.25, # Width of the error bars
-              position=position_dodge(.9)) + #Where to put the errorbars
-xlab("Treatment Condition") + # X axis label
-ylab(" % of Cells CD11c+") + # Y axis label
-## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
-ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
+  geom_bar(position=position_dodge(), stat="identity",colour="black") +
+  #scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+                size=0.5, #Size of the error bars
+                width=.25, # Width of the error bars
+                position=position_dodge(.9)) + #Where to put the errorbars
+  xlab("Treatment Condition") + # X axis label
+  ylab(" % of Cells CD11c+") + # Y axis label
+  ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
+  ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
 
 #Finalize plot
 CD11c_final <- CD11c_plot + publication_style
@@ -176,16 +172,16 @@ MHCII <- sp %>%
 
 #Generate a graph
 MHCII_plot <- ggplot(MHCII, aes(x=Condition, y=mean, fill=Parameter)) +
-geom_bar(position=position_dodge(), stat="identity",colour="black") +
-#scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
-geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
-              size=0.5, #Size of the error bars
-              width=.25, # Width of the error bars
-              position=position_dodge(.9)) + #Where to put the errorbars
-xlab("Treatment Condition") + # X axis label
-ylab(" % of Cells MHCII+") + # Y axis label
-## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
-ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
+  geom_bar(position=position_dodge(), stat="identity",colour="black") +
+  #scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+                size=0.5, #Size of the error bars
+                width=.25, # Width of the error bars
+                position=position_dodge(.9)) + #Where to put the errorbars
+  xlab("Treatment Condition") + # X axis label
+  ylab(" % of Cells MHCII+") + # Y axis label
+  ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
+  ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
 
 #Finalize plot
 MHCII_final <- MHCII_plot + publication_style
@@ -213,16 +209,16 @@ F4.80 <- sp %>%
 
 #Generate a graph
 F4.80_plot <- ggplot(F4.80, aes(x=Condition, y=mean, fill=Parameter)) +
-geom_bar(position=position_dodge(), stat="identity",colour="black") +
-#scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
-geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
-              size=0.5, #Size of the error bars
-              width=.25, # Width of the error bars
-              position=position_dodge(.9)) + #Where to put the errorbars
-xlab("Treatment Condition") + # X axis label
-ylab(" % of Cells F4.80+") + # Y axis label
-## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
-ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
+  geom_bar(position=position_dodge(), stat="identity",colour="black") +
+  #scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+                size=0.5, #Size of the error bars
+                width=.25, # Width of the error bars
+                position=position_dodge(.9)) + #Where to put the errorbars
+  xlab("Treatment Condition") + # X axis label
+  ylab(" % of Cells F4.80+") + # Y axis label
+  ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
+  ggtitle("") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
 
 #Finalize plot
 F4.80_final <- F4.80_plot + publication_style
@@ -253,29 +249,29 @@ PKH.MHCII <- sp%>%                                      #Create another datafram
   group_by(Replicate,Animal,Condition,Parameter)%>%     #Organize data 
   select(-Total,-Gated)%>%                              #Remove the total and gated columns as they aren't needed
   filter(Gate == "PKH+MHCII+")                          #Look only for PKH+MHCII+ cells within the Gate column
-  
+
 Gated_MHCII_PKH <-inner_join(PKH.MHCII,MHCII_cells)%>%           #Join the two data frames
   mutate(Ratio = (Number/MHCII) * 100 )%>%  #Create a new column named 'Ratio' = PKH+ cells/all MHCII+ cells (Calculates how many MHCII are PKH pos)
   group_by(Animal,Condition,Parameter)%>%   #Organize the data by looking only at the Animal, Condition and Parameter columns
   mutate(average = mean(Ratio))%>%          #Create a new column to average the technical replicates (2)
   group_by(Condition,Parameter)%>%          #Organize the data by looking at the Condition and Parameter columns
   summarise(   N = length(average),         #Summarize the data by averaging the three biological replicates and calculate the standard deviation
-            mean = mean(average),           #and standard error
-              sd = sd(average),
-              se = sd / sqrt(N))
+               mean = mean(average),           #and standard error
+               sd = sd(average),
+               se = sd / sqrt(N))
 
 #Generate a graph
 Ratio_MHCII_PKHpos_plot <- ggplot(Gated_MHCII_PKH, aes(x=Condition, y=mean, fill=Parameter)) +
-    geom_bar(position=position_dodge(), stat="identity",colour="black") +
-    #scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
-    geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
-                  size=0.5, #Size of the error bars
-                  width=.25, # Width of the error bars
-                  position=position_dodge(.9)) + #Where to put the errorbars
-    xlab("Treatment Condition") + # X axis label
-    ylab(" % of Cells PKH+") + # Y axis label
-    ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
-    ggtitle("MHCII+ Splenocytes") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
+  geom_bar(position=position_dodge(), stat="identity",colour="black") +
+  #scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+                size=0.5, #Size of the error bars
+                width=.25, # Width of the error bars
+                position=position_dodge(.9)) + #Where to put the errorbars
+  xlab("Treatment Condition") + # X axis label
+  ylab(" % of Cells PKH+") + # Y axis label
+  ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
+  ggtitle("MHCII+ Splenocytes") + scale_y_continuous(expand=c(0,0),limits = c(0, 70)) # Plot title, make graph sit on x axis, define y axis values
 
 #Finalize plot
 Ratio_MHCII_PKHpos_plot_final <- Ratio_MHCII_PKHpos_plot + publication_style
@@ -313,18 +309,18 @@ Gated_CD11b_PKH <-inner_join(PKH.CD11b,CD11b_cells)%>%
                mean = mean(average),          
                sd = sd(average),
                se = sd / sqrt(N))
-  
+
 Ratio_CD11b_PKHpos_plot <- ggplot(Gated_CD11b_PKH, aes(x=Condition, y=mean, fill=Parameter)) +
-geom_bar(position=position_dodge(), stat="identity",colour="black") +
-#scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
-geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
-              size=0.5, 
-              width=.25, 
-              position=position_dodge(.9)) +
-xlab("Treatment Condition") + 
-ylab(" % of Cells PKH67+") +
-## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
-ggtitle("CD11b+ Splenocytes") + scale_y_continuous(expand=c(0,0),limits = c(0, 80)) 
+  geom_bar(position=position_dodge(), stat="identity",colour="black") +
+  #scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+                size=0.5, 
+                width=.25, 
+                position=position_dodge(.9)) +
+  xlab("Treatment Condition") + 
+  ylab(" % of Cells PKH67+") +
+  ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
+  ggtitle("CD11b+ Splenocytes") + scale_y_continuous(expand=c(0,0),limits = c(0, 80)) 
 
 Ratio_CD11b_PKHpos_plot_final <- Ratio_CD11b_PKHpos_plot + publication_style
 
@@ -359,16 +355,16 @@ Gated_CD11c_PKH <-inner_join(PKH.CD11c,CD11c_cells)%>%
                se = sd / sqrt(N))
 
 Ratio_CD11c_PKHpos_plot <- ggplot(Gated_CD11c_PKH, aes(x=Condition, y=mean, fill=Parameter)) +
-geom_bar(position=position_dodge(), stat="identity",colour="black") +
-#scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
-geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
-              size=0.5, 
-              width=.25, 
-              position=position_dodge(.9)) +
-xlab("Treatment Condition") + 
-ylab(" % of Cells PKH67+") +
-## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
-ggtitle("CD11c+ Splenocytes") + scale_y_continuous(expand=c(0,0),limits = c(0, 80)) 
+  geom_bar(position=position_dodge(), stat="identity",colour="black") +
+  #scale_fill_manual(values=c("black", "grey"))+ #Set colors to black and white
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+                size=0.5, 
+                width=.25, 
+                position=position_dodge(.9)) +
+  xlab("Treatment Condition") + 
+  ylab(" % of Cells PKH67+") +
+  ## OPTIONAL ##scale_fill_hue(name="", breaks=c(""), labels=c("")) +
+  ggtitle("CD11c+ Splenocytes") + scale_y_continuous(expand=c(0,0),limits = c(0, 80)) 
 
 Ratio_CD11c_PKHpos_plot_final <- Ratio_CD11c_PKHpos_plot + publication_style
 
@@ -422,4 +418,3 @@ Ratio_F4.80_PKHpos_plot_final
 png("~/R_plots/Ratio_F4.80_PKHpos_graph_hi_res.png", width = 7, height = 5, units = 'in', res = 600)
 Ratio_F4.80_PKHpos_plot_final
 dev.off()
-
